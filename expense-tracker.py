@@ -34,7 +34,7 @@ def summarize_expenses(by="Category"):
 print(summarize_expenses())
 
 client = OpenAI(api_key=
-                "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")
+                "")
 
 def auto_categorize(note):
     prompt = f"""
