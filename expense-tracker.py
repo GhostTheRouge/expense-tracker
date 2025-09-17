@@ -1,4 +1,6 @@
 import pandas as pd
+from openai import OpenAI
+import matplotlib.pyplot as plt
 
 df = pd.read_csv("expense_data_1.csv")
 #print(df.head())
@@ -30,3 +32,46 @@ def summarize_expenses(by="Category"):
     ## e.g. food expenses are summed together etc...
     return summary.sort_values(ascending=False) # Sorts categories by total spending from highest to lowest
 print(summarize_expenses())
+
+client = OpenAI(api_key=
+                "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")
+
+def auto_categorize(note):
+    prompt = f"""
+    Categorize this expense note into one of these categories:
+    Food, Transportation, Entertainment, Other.
+    Note: {note}
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return "Other"
+    
+data['Category'] = data.apply(
+    lambda row: auto_categorize(row['Note']) if pd.isna(row['Category']) else row['Category'],
+    axis=1
+)
+
+print(data[['Note', 'Category']].head(10))
+
+expense_summary = data[data['Category'] != 'Income'].groupby("Category")['Amount'].sum()
+
+# Pie Chart
+plt.figure(figsize=(6,6))
+expense_summary.plot.pie(autopct='%1.1f%%', startangle=90, shadow=True)
+plt.title("Expenses Breakdown by Category")
+plt.ylabel("")
+plt.show()
+
+# Bar Chart
+plt.figure(figsize=(8.5))
+expense_summary.plot(kind="bar", color="skyblue", edgecolor="black")
+plt.title("Expenses by Category")
+plt.xlabel("Category")
+plt.ylabl("Amount Spent")
+plt.show()
