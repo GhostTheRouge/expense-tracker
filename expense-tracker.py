@@ -33,8 +33,8 @@ def summarize_expenses(by="Category"):
     return summary.sort_values(ascending=False) # Sorts categories by total spending from highest to lowest
 print(summarize_expenses())
 
-client = OpenAI(api_key=
-                "")
+# client = OpenAI(api_key=
+#                 "")
 
 def auto_categorize(note):
     prompt = f"""
